@@ -1,0 +1,36 @@
+name: Retrieve and Convert deb to rpm
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  retrieve-and-convert:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y alien curl
+
+    - name: Retrieve the latest .deb file
+      run: |
+        URL="https://packages.easyroam.de/repos/easyroam-desktop/pool/main/e/easyroam-desktop/"
+        FILE=$(curl -s "$URL" | grep -oP 'easyroam_connect_desktop-[\d.+-]+linux.deb' | sort -V | tail -n 1)
+        echo "Downloading $FILE..."
+        curl -O "$URL$FILE"
+
+    - name: Convert deb to rpm
+      run: |
+        mkdir -p output
+        sudo alien --to-rpm --scripts easyroam_connect_desktop-*.deb
+        mv *.rpm output/
+
+    - name: Upload RPM as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: rpm-artifact
+        path: output/*.rpm
