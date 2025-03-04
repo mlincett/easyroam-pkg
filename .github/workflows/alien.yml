@@ -29,8 +29,30 @@ jobs:
         sudo alien --to-rpm --scripts easyroam_connect_desktop-*.deb
         mv *.rpm output/
 
-    - name: Upload RPM as artifact
-      uses: actions/upload-artifact@v3
+    - name: Upload RPM as artifact (temporary)
+      uses: actions/upload-artifact@v4
       with:
-        name: rpm-artifact
-        path: output/*.rpm
+      name: rpm-artifact
+      path: output/*.rpm
+      retention-days: 90
+
+    - name: Get version number
+      id: get_version
+      run: |
+      VERSION=$(ls output/*.rpm | grep -oP 'easyroam_connect_desktop-\K[\d.+-]+(?=\.rpm)')
+      echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # - name: Create Release
+    #   id: create_release
+    #   uses: softprops/action-gh-release@v1
+    #   with:
+    #   files: output/*.rpm
+    #   tag_name: v${{ steps.get_version.outputs.version }}
+    #   name: Release ${{ steps.get_version.outputs.version }}
+    #   draft: false
+    #   prerelease: false
+    #   env:
+    #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
