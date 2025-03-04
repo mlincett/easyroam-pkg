@@ -39,8 +39,8 @@ jobs:
     - name: Get version number
       id: get_version
       run: |
-      VERSION=$(ls output/*.rpm | grep -oP 'easyroam_connect_desktop-\K[\d.+-]+(?=\.rpm)')
-      echo "version=$VERSION" >> $GITHUB_OUTPUT
+        VERSION=$(ls output/*.rpm | grep -oP 'easyroam_connect_desktop-\K[\d.+-]+(?=\.rpm)')
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Checkout repository
       uses: actions/checkout@v3
